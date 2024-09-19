@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import PropTypes from 'prop-types';
@@ -27,19 +28,19 @@ function createData(id, name, certification, firstCertification, lastUpdate, mat
 }
 
 const rows = [
-    createData(98674653600, 'Cláudio Emilio Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(11111111111, 'Joao Luiz Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(22222222222, 'Roberto Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(33333333333, 'Bruno Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(44444444444, 'Marcos Aurelio Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(55555555555, 'Peietro Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(66666666666, 'Luiz  Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(77777777777, 'Mauricio Roger Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'inactive'),
-    createData(46656356564, 'Abel Ferreira', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(86865685684, 'Eduardo Pereira Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(32343243544, 'Edmundo Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
-    createData(76888880453, 'Francisco Jorge', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'inactive'),
-    createData(14135352644, 'Gustavo Gomez', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'active'),
+    createData(98674653600, 'Cláudio Emilio Cotta Joaquim', 'CEA', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
+    createData(11111111111, 'Joao Luiz Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
+    createData(22222222222, 'Roberto Cotta Joaquim', 'CPA20', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
+    createData(33333333333, 'Bruno Cotta Joaquim', 'CEA', '11/11/1111', '29/12/2023', '01/01/2025', 'INACTIVE'),
+    createData(44444444444, 'Marcos Aurelio Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
+    createData(55555555555, 'Peietro Cotta Joaquim', 'CPA20', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
+    createData(66666666666, 'Luiz  Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
+    createData(77777777777, 'Mauricio Roger Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'INACTIVE'),
+    createData(46656356564, 'Abel Ferreira', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'INACTIVE'),
+    createData(86865685684, 'Eduardo Pereira Joaquim', 'CPA20', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
+    createData(32343243544, 'Edmundo Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
+    createData(76888880453, 'Francisco Jorge', 'CEA', '11/11/1111', '29/12/2023', '01/01/2025', 'INACTIVE'),
+    createData(14135352644, 'Gustavo Gomez', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
   ];
 
 function descendingComparator(a, b, orderBy) {
@@ -259,11 +260,25 @@ export const TableCertification = () => {
                                 >
                                     {row.name}
                                 </TableCell>
-                                <TableCell align="right">{row.certification}</TableCell>
+                                <TableCell align="right">
+                                  {row.certification === "CPA10" ?  
+                                    <Chip label={row.certification} sx={{ color: '#0b5394', bgcolor: '#cfe2f3', fontWeight: 'bold'}}/>
+                                      : row.certification === "CPA20" ?
+                                    <Chip label={row.certification} sx={{ color: '#38761d', bgcolor: '#d9ead3', fontWeight: 'bold'}}/> 
+                                      :
+                                    <Chip label={row.certification} sx={{ color: '#FFC300', bgcolor: '#fff2cc', fontWeight: 'bold', width: '68px'}}/> 
+                                  }
+                                </TableCell>
                                 <TableCell align="right">{row.firstCertification}</TableCell>
                                 <TableCell align="right">{row.lastUpdate}</TableCell>
                                 <TableCell align="right">{row.maturity}</TableCell>
-                                <TableCell align="right">{row.situation}</TableCell>
+                                <TableCell align="right">
+                                  {row.situation === 'ACTIVE' ? 
+                                    <Chip label={row.situation} sx={{ color: '#38761d', bgcolor: '#d9ead3', fontWeight: 'bold'}}/> 
+                                  :
+                                    <Chip label={row.situation} sx={{ color: '#c30101', bgcolor: '#f4cccc', fontWeight: 'bold'}}/> 
+                                  }
+                                </TableCell>
                             </TableRow>
                             );
                         })}
