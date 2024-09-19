@@ -1,8 +1,11 @@
 import { useState, useMemo } from 'react'
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
 import PropTypes from 'prop-types';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -12,8 +15,9 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
-import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import { visuallyHidden } from '@mui/utils';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
 
 function createData(id, name, certification, firstCertification, lastUpdate, maturity, situation) {
     return {
@@ -156,7 +160,18 @@ export const TableCertification = () => {
     const [orderBy, setOrderBy] = useState('name');
     const [selected, setSelected] = useState([]);
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
 
     const handleRequestSort = (event, property) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -213,7 +228,33 @@ export const TableCertification = () => {
     return (
         <Container sx={{ paddingTop: '24px'}}>
             <Paper sx={{ width: '100%', mb: 2, padding: '16px'}}>
-                <Typography variant="h5">Resultados encontrados</Typography>
+              <TableHead sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0 20px'}}>
+                  <Typography variant="h5">Resultados encontrados</Typography>
+                  <Button
+                    variant="contained"
+                    aria-controls={open ? 'basic-menu' : undefined}
+                    aria-haspopup="true"
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={handleClick}
+                    startIcon={<FileDownloadIcon />}
+                    sx={{ color: '#000000', bgcolor: 'transparent'}}
+                  >
+                    EXPORTAR
+                  </Button>
+                  <Menu
+                    id="basic-menu"
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    MenuListProps={{
+                      'aria-labelledby': 'basic-button',
+                    }}
+                  >
+                    <MenuItem onClick={handleClose}>Exportar para PDF</MenuItem>
+                    <MenuItem onClick={handleClose}>Exportar para Excel</MenuItem>
+                  </Menu>
+              </TableHead>
+                
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
