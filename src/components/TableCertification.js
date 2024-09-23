@@ -244,7 +244,7 @@ export const TableCertification = () => {
     );
 
     return (
-        <Container sx={{ paddingTop: '24px'}}>
+        <Container sx={{ paddingTop: '24px', width: '95%'}} maxWidth="false">
             <Paper sx={{ width: '100%', mb: 2, padding: '16px'}}>
               {user.length === 0 ? (
                 <Input 
@@ -330,7 +330,7 @@ export const TableCertification = () => {
                                               {row.name}
                                           </TableCell>
 
-                                          <TableCell align="center">
+                                          <TableCell align="right">
                                             {row.note}
                                           </TableCell>
                                           <TableCell align="center">
