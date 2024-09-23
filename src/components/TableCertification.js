@@ -1,8 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import axios from 'axios';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Container from '@mui/material/Container';
+import Input from '@mui/material/Input'
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Paper from '@mui/material/Paper';
@@ -18,34 +20,6 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Typography from '@mui/material/Typography';
 import { visuallyHidden } from '@mui/utils';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-
-function createData(id, name, certification, firstCertification, lastUpdate, maturity, situation) {
-    return {
-      id,
-      name,
-      certification,
-      firstCertification,
-      lastUpdate,
-      maturity,
-      situation,
-    };
-}
-
-const rows = [
-    createData(98674653600, 'Cláudio Emilio Cotta Joaquim', 'CEA', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
-    createData(11111111111, 'Joao Luiz Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
-    createData(22222222222, 'Roberto Cotta Joaquim', 'CPA20', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
-    createData(33333333333, 'Bruno Cotta Joaquim', 'CEA', '11/11/1111', '29/12/2023', '01/01/2025', 'INACTIVE'),
-    createData(44444444444, 'Marcos Aurelio Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
-    createData(55555555555, 'Peietro Cotta Joaquim', 'CPA20', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
-    createData(66666666666, 'Luiz  Cotta Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
-    createData(77777777777, 'Mauricio Roger Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'INACTIVE'),
-    createData(46656356564, 'Abel Ferreira', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'INACTIVE'),
-    createData(86865685684, 'Eduardo Pereira Joaquim', 'CPA20', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
-    createData(32343243544, 'Edmundo Joaquim', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
-    createData(76888880453, 'Francisco Jorge', 'CEA', '11/11/1111', '29/12/2023', '01/01/2025', 'INACTIVE'),
-    createData(14135352644, 'Gustavo Gomez', 'CPA10', '11/11/1111', '29/12/2023', '01/01/2025', 'ACTIVE'),
-  ];
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -67,7 +41,7 @@ const headCells = [
     {
       id: 'cpf',
       numeric: true,
-      disablePadding: false,
+      disablePadding: true,
       label: 'CPF',
     },
     {
@@ -121,7 +95,7 @@ function EnhancedTableHead(props) {
           {headCells.map((headCell) => (
             <TableCell
               key={headCell.id}
-              align={headCell.numeric ? 'right' : 'left'}
+              align={headCell.numeric ? 'right' : 'center'}
               padding={headCell.disablePadding ? 'none' : 'normal'}
               sortDirection={orderBy === headCell.id ? order : false}
             >
@@ -162,8 +136,26 @@ export const TableCertification = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [user, setUser] = useState([]);
 
     const open = Boolean(anchorEl);
+
+    const fetchData = async (event) => {
+
+      const formdata = new FormData();
+      formdata.append("file", event.target.files[0]);
+
+      await axios("https://wi37wngbxtenwyhgk6r5tts5mi0vrtcp.lambda-url.us-east-1.on.aws/anbima",{
+        method: "post", 
+        mode: "no-cors",
+        data: formdata,
+        headers :{
+          "Content-Type": "multipart/form-data",
+          'Access-Control-Allow-Origin' : '*',
+        }
+      })
+      .then(res => setUser(res.data.data))
+    }
 
     const handleClick = (event) => {
       setAnchorEl(event.currentTarget);
@@ -181,7 +173,7 @@ export const TableCertification = () => {
     
     const handleSelectAllClick = (event) => {
         if (event.target.checked) {
-          const newSelected = rows.map((n) => n.id);
+          const newSelected = user.map((n) => n.id);
           setSelected(newSelected);
           return;
         }
@@ -219,10 +211,10 @@ export const TableCertification = () => {
 
     const visibleRows = useMemo(
         () =>
-        [...rows]
+        [...user]
             .sort(getComparator(order, orderBy))
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-        [order, orderBy, page, rowsPerPage],
+        [order, orderBy, page, rowsPerPage], user,
     );
 
     return (
@@ -230,6 +222,11 @@ export const TableCertification = () => {
             <Paper sx={{ width: '100%', mb: 2, padding: '16px'}}>
               <TableHead sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0 20px'}}>
                   <Typography variant="h5">Resultados encontrados</Typography>
+                  <Input 
+                    id="input-exampple"
+                    type="file"
+                    onChange={(e) => fetchData(e)}
+                  />
                   <Button
                     variant="contained"
                     aria-controls={open ? 'basic-menu' : undefined}
@@ -266,62 +263,116 @@ export const TableCertification = () => {
                             orderBy={orderBy}
                             onSelectAllClick={handleSelectAllClick}
                             onRequestSort={handleRequestSort}
-                            rowCount={rows.length}
+                            rowCount={user.length}
+                            key={user.id}
                         />
                         <TableBody>
                         {visibleRows.map((row, index) => {
-                            const isItemSelected = selected.includes(row.id);
+                          console.log("visibleRows", row)
+                            const isItemSelected = selected.includes(row.cpf);
                             const labelId = `enhanced-table-checkbox-${index}`;
 
                             return (
-                            <TableRow
-                                hover
-                                role="checkbox"
-                                aria-checked={isItemSelected}
-                                tabIndex={-1}
-                                key={row.id}
-                                selected={isItemSelected}
-                                sx={{ cursor: 'pointer' }}
-                            >
-                                <TableCell
-                                    component="th"
-                                    id={labelId}
-                                    scope="row"
-                                    padding="none"
-                                    align="right"
-                                >
-                                    {row.id}
-                                </TableCell>
-                                <TableCell
-                                    component="th"
-                                    id={labelId}
-                                    scope="row"
-                                    padding="none"
-                                    align="right"
-                                >
-                                    {row.name}
-                                </TableCell>
-                                <TableCell align="right">
-                                  {row.certification === "CPA10" ?  
-                                    <Chip label={row.certification} sx={{ color: '#0b5394', bgcolor: '#cfe2f3', fontWeight: 'bold'}}/>
-                                      : row.certification === "CPA20" ?
-                                    <Chip label={row.certification} sx={{ color: '#38761d', bgcolor: '#d9ead3', fontWeight: 'bold'}}/> 
-                                      :
-                                    <Chip label={row.certification} sx={{ color: '#FFC300', bgcolor: '#fff2cc', fontWeight: 'bold', width: '68px'}}/> 
-                                  }
-                                </TableCell>
-                                <TableCell align="right">{row.firstCertification}</TableCell>
-                                <TableCell align="right">{row.lastUpdate}</TableCell>
-                                <TableCell align="right">{row.maturity}</TableCell>
-                                <TableCell align="right">
-                                  {row.situation === 'ACTIVE' ? 
-                                    <Chip label={row.situation} sx={{ color: '#38761d', bgcolor: '#d9ead3', fontWeight: 'bold'}}/> 
-                                  :
-                                    <Chip label={row.situation} sx={{ color: '#c30101', bgcolor: '#f4cccc', fontWeight: 'bold'}}/> 
-                                  }
-                                </TableCell>
-                            </TableRow>
-                            );
+                              <>
+                                {row.certifications.length === 0 ? (
+                                  <TableRow
+                                      hover
+                                      role="checkbox"
+                                      aria-checked={isItemSelected}
+                                      tabIndex={-1}
+                                      key={row.id}
+                                      selected={isItemSelected}
+                                      sx={{ cursor: 'pointer' }}
+                                  >
+                                          <TableCell
+                                              component="th"
+                                              id={labelId}
+                                              scope="row"
+                                              padding="none"
+                                              align="center"
+                                          >
+                                              {row.cpf}
+                                          </TableCell>
+                                          <TableCell
+                                              component="th"
+                                              id={labelId}
+                                              scope="row"
+                                              padding="none"
+                                              align="right"
+                                          >
+                                              {row.name}
+                                          </TableCell>
+
+                                          <TableCell align="center">
+                                            {row.note}
+                                          </TableCell>
+                                          <TableCell align="center">
+                                            -
+                                          </TableCell>
+                                          <TableCell align="center">
+                                            -
+                                          </TableCell>
+                                          <TableCell align="center">
+                                            -
+                                          </TableCell>
+                                          <TableCell align="center">
+                                            -
+                                          </TableCell>
+                                  </TableRow>
+                                ) : (
+                                  row.certifications.map((node => {
+                                    return (
+                                      <TableRow
+                                        hover
+                                        role="checkbox"
+                                        aria-checked={isItemSelected}
+                                        tabIndex={-1}
+                                        key={row.id}
+                                        selected={isItemSelected}
+                                        sx={{ cursor: 'pointer' }}
+                                      >
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align="right"
+                                        >
+                                            {row.cpf}
+                                        </TableCell>
+                                        <TableCell
+                                            component="th"
+                                            id={labelId}
+                                            scope="row"
+                                            padding="none"
+                                            align="right"
+                                        >
+                                            {row.name}
+                                        </TableCell>
+                                        <TableCell align="right">
+                                        {node.name === "CPA-10" ?  
+                                          <Chip label={node.name} sx={{ color: '#0b5394', bgcolor: '#cfe2f3', fontWeight: 'bold', width: '80px'}}/>
+                                            : node.name === "CPA-20" ?
+                                          <Chip label={node.name} sx={{ color: '#38761d', bgcolor: '#d9ead3', fontWeight: 'bold', width: '80px'}}/> 
+                                            :
+                                          <Chip label={node.name} sx={{ color: '#FFC300', bgcolor: '#fff2cc', fontWeight: 'bold', width: '80px'}}/> 
+                                        }
+                                        </TableCell>
+                                        <TableCell align="right">{node.first_certification}</TableCell>
+                                        <TableCell align="right">{node.last_update}</TableCell>
+                                        <TableCell align="right">{node.due_date}</TableCell>
+                                        <TableCell align="right">
+                                          {node.status === 'Ativa' ? 
+                                            <Chip label={node.status} sx={{ color: '#38761d', bgcolor: '#d9ead3', fontWeight: 'bold'}}/> 
+                                          :
+                                            <Chip label="Inativa" sx={{ color: '#c30101', bgcolor: '#f4cccc', fontWeight: 'bold'}}/> 
+                                          }
+                                        </TableCell>
+                                      </TableRow>
+                                    )}))
+                                  )}
+                              </>
+                            )
                         })}
                         </TableBody>
                     </Table>
@@ -329,7 +380,7 @@ export const TableCertification = () => {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={rows.length}
+                    count={user.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
