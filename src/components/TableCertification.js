@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import axios from 'axios';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -140,22 +140,23 @@ export const TableCertification = () => {
 
     const open = Boolean(anchorEl);
 
-    const fetchData = async (event) => {
+    
+      const fetchData = useCallback(async (event) => {
 
-      const formdata = new FormData();
-      formdata.append("file", event.target.files[0]);
-
-      await axios("https://wi37wngbxtenwyhgk6r5tts5mi0vrtcp.lambda-url.us-east-1.on.aws/anbima",{
-        method: "post", 
-        mode: "no-cors",
-        data: formdata,
-        headers :{
-          "Content-Type": "multipart/form-data",
-          'Access-Control-Allow-Origin' : '*',
-        }
-      })
-      .then(res => setUser(res.data.data))
-    }
+        const formdata = new FormData();
+        formdata.append("file", event.target.files[0]);
+  
+        await axios("https://wi37wngbxtenwyhgk6r5tts5mi0vrtcp.lambda-url.us-east-1.on.aws/anbima",{
+          method: "post", 
+          mode: "no-cors",
+          data: formdata,
+          headers :{
+            "Content-Type": "multipart/form-data",
+            'Access-Control-Allow-Origin' : '*',
+          }
+        })
+        .then(res => setUser(res.data.data))
+      }, [user])
 
     const handleClick = (event) => {
       setAnchorEl(event.currentTarget);
@@ -214,19 +215,21 @@ export const TableCertification = () => {
         [...user]
             .sort(getComparator(order, orderBy))
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-        [order, orderBy, page, rowsPerPage], user,
+        [order, orderBy, page, rowsPerPage, user], user,
     );
 
     return (
         <Container sx={{ paddingTop: '24px'}}>
             <Paper sx={{ width: '100%', mb: 2, padding: '16px'}}>
-              <TableHead sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0 20px'}}>
+              {user.length === 0 ? (
+                <Input 
+                  id="input-exampple"
+                  type="file"
+                  onChange={(e) => fetchData(e)}
+                />
+              ) : (
+                <TableHead sx={{ display: 'flex', justifyContent: 'space-between', margin: '10px 0 20px'}}>
                   <Typography variant="h5">Resultados encontrados</Typography>
-                  <Input 
-                    id="input-exampple"
-                    type="file"
-                    onChange={(e) => fetchData(e)}
-                  />
                   <Button
                     variant="contained"
                     aria-controls={open ? 'basic-menu' : undefined}
@@ -251,7 +254,7 @@ export const TableCertification = () => {
                     <MenuItem onClick={handleClose}>Exportar para Excel</MenuItem>
                   </Menu>
               </TableHead>
-                
+              )}    
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
@@ -268,7 +271,6 @@ export const TableCertification = () => {
                         />
                         <TableBody>
                         {visibleRows.map((row, index) => {
-                          console.log("visibleRows", row)
                             const isItemSelected = selected.includes(row.cpf);
                             const labelId = `enhanced-table-checkbox-${index}`;
 
