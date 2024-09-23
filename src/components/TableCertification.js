@@ -245,7 +245,7 @@ export const TableCertification = () => {
 
     return (
         <Container sx={{ paddingTop: '24px', width: '95%'}} maxWidth="false">
-            <Paper sx={{ width: '100%', mb: 2, padding: '16px'}}>
+            <Paper sx={{ mb: 2, padding: '16px'}}>
               {user.length === 0 ? (
                 <Input 
                   id="csvFileInput" 
