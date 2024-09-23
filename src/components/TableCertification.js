@@ -20,6 +20,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Typography from '@mui/material/Typography';
 import { visuallyHidden } from '@mui/utils';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import * as XLSX from 'xlsx';
 
 function descendingComparator(a, b, orderBy) {
     if (b[orderBy] < a[orderBy]) {
@@ -137,11 +138,13 @@ export const TableCertification = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [anchorEl, setAnchorEl] = useState(null);
     const [user, setUser] = useState([]);
+    const [csvFile, setCsvFile] = useState(null);
 
     const open = Boolean(anchorEl);
 
     
       const fetchData = useCallback(async (event) => {
+        setCsvFile(event.target.files[0]);
 
         const formdata = new FormData();
         formdata.append("file", event.target.files[0]);
@@ -156,7 +159,29 @@ export const TableCertification = () => {
           }
         })
         .then(res => setUser(res.data.data))
-      }, [user])
+      }, [])
+
+
+      function convertCSVtoExcel() {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const data = e.target.result;
+            const workbook = XLSX.read(data, { type: 'string', codepage: 65001 });
+
+            // Se o CSV tem uma única planilha
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            // Criar um novo arquivo Excel
+            const newWorkbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(newWorkbook, worksheet, 'Sheet1');
+
+            // Exportar o arquivo Excel
+            XLSX.writeFile(newWorkbook, 'output.xlsx');
+        };
+
+        reader.readAsText(csvFile);
+      }
 
     const handleClick = (event) => {
       setAnchorEl(event.currentTarget);
@@ -223,7 +248,8 @@ export const TableCertification = () => {
             <Paper sx={{ width: '100%', mb: 2, padding: '16px'}}>
               {user.length === 0 ? (
                 <Input 
-                  id="input-exampple"
+                  id="csvFileInput" 
+                  accept=".csv"
                   type="file"
                   onChange={(e) => fetchData(e)}
                 />
@@ -250,8 +276,7 @@ export const TableCertification = () => {
                       'aria-labelledby': 'basic-button',
                     }}
                   >
-                    <MenuItem onClick={handleClose}>Exportar para PDF</MenuItem>
-                    <MenuItem onClick={handleClose}>Exportar para Excel</MenuItem>
+                    <MenuItem onClick={convertCSVtoExcel}>Exportar para Excel</MenuItem>
                   </Menu>
               </TableHead>
               )}    
