@@ -154,7 +154,7 @@ export const TableCertification = () => {
   const [user, setUser] = useState([]);
   const [csvFile, setCsvFile] = useState(null);
   const [cpf, setCpf] = useState("");
-  const [listaCpf, setListaCpf] = useState([]);
+  const [listCpf, setListCpf] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -204,26 +204,25 @@ export const TableCertification = () => {
       reader.onload = (e) => {
         const data = e.target.result;
         const workbook = XLSX.read(data, { type: "string", codepage: 65001 });
-  
+
         // Se o CSV tem uma única planilha
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-  
+
         // Criar um novo arquivo Excel
         const newWorkbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(newWorkbook, worksheet, "Sheet1");
-  
+
         // Exportar o arquivo Excel
         XLSX.writeFile(newWorkbook, "output.xlsx");
       };
-  
+
       reader.readAsText(csvFile);
     } else {
-
-      const dadosAchatados = user.flatMap((dado) => {
-        return dado.certifications.map((certification, index) => ({
-          cpf: dado.cpf,
-          nome: dado.name,
+      const dataFlattened = user.flatMap((data) => {
+        return data.certifications.map((certification, index) => ({
+          cpf: data.cpf,
+          nome: data.name,
           certificacao: certification.name,
           primeiraCertificacao: certification.first_certification,
           ultimaAtualizacao: certification.last_update,
@@ -231,42 +230,39 @@ export const TableCertification = () => {
           situacao: certification.status,
         }));
       });
-        // Criar nova planilha de trabalho
-        const planilha = XLSX.utils.json_to_sheet(dadosAchatados);
-        console.log("user tabble", user)
-        const livro = XLSX.utils.book_new();
+      
+      const planilha = XLSX.utils.json_to_sheet(dataFlattened);
+      const livro = XLSX.utils.book_new();
 
-        // Adicionar a planilha ao livro
-        XLSX.utils.book_append_sheet(livro, planilha, 'Dados');
+      
+      XLSX.utils.book_append_sheet(livro, planilha, "Dados");
 
-        // Gerar arquivo Excel e baixar
-        XLSX.writeFile(livro, 'tabela.xlsx');
+      
+      XLSX.writeFile(livro, "tabela.xlsx");
     }
-
   }
   // Função para adicionar CPF à lista
-  const adicionarCpf = () => {
-    if (cpf && !listaCpf.includes(cpf)) {
-      setListaCpf([...listaCpf, cpf]);
+  const addCpf = () => {
+    if (cpf && !listCpf.includes(cpf)) {
+      setListCpf([...listCpf, cpf]);
       setCpf("");
     }
   };
 
   // Função para remover CPF da lista
-  const removerCpf = (cpfRemover) => {
-    setListaCpf(listaCpf.filter((c) => c !== cpfRemover));
+  const removeCpf = (cpfRemover) => {
+    setListCpf(listCpf.filter((c) => c !== cpfRemover));
   };
 
-  // Função para simular busca de CPF (aqui você colocaria sua lógica de busca)
-  const buscarCpfs = async (event) => {
-    console.log("Buscando CPFs:", listaCpf);
+  // Função busca de CPF 
+  const searchCpfs = async (event) => {
     setLoading(true);
 
     try {
-      if (listaCpf.length === 1) {
+      if (listCpf.length === 1) {
         await axios
           .get(
-            `https://wi37wngbxtenwyhgk6r5tts5mi0vrtcp.lambda-url.us-east-1.on.aws/anbima/${listaCpf}`,
+            `https://wi37wngbxtenwyhgk6r5tts5mi0vrtcp.lambda-url.us-east-1.on.aws/anbima/${listCpf}`,
             {
               mode: "no-cors",
               headers: {
@@ -278,7 +274,7 @@ export const TableCertification = () => {
       } else {
         await axios
           .get(
-            `https://wi37wngbxtenwyhgk6r5tts5mi0vrtcp.lambda-url.us-east-1.on.aws/anbima/multi?cpf=${listaCpf}`,
+            `https://wi37wngbxtenwyhgk6r5tts5mi0vrtcp.lambda-url.us-east-1.on.aws/anbima/multi?cpf=${listCpf}`,
             {
               mode: "no-cors",
               headers: {
@@ -399,10 +395,10 @@ export const TableCertification = () => {
                 onChange={(e) => setCpf(e.target.value)}
                 sx={{ margin: "20px 0" }}
               />
-              {listaCpf.length > 0 && (
+              {listCpf.length > 0 && (
                 <Button
                   variant="contained"
-                  onClick={(e) => buscarCpfs(e)}
+                  onClick={(e) => searchCpfs(e)}
                   sx={{
                     color: "#000000",
                     bgcolor: "transparent",
@@ -421,7 +417,7 @@ export const TableCertification = () => {
             )}
             <Button
               variant="contained"
-              onClick={adicionarCpf}
+              onClick={addCpf}
               disabled={!cpf}
               sx={{ color: "#000000", bgcolor: "transparent" }}
             >
@@ -429,13 +425,13 @@ export const TableCertification = () => {
             </Button>
 
             <List>
-              {listaCpf.map((cpfItem, index) => (
+              {listCpf.map((cpfItem, index) => (
                 <ListItem key={index}>
                   {cpfItem}
                   <IconButton
                     edge="end"
                     aria-label="delete"
-                    onClick={() => removerCpf(cpfItem)}
+                    onClick={() => removeCpf(cpfItem)}
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -505,10 +501,10 @@ export const TableCertification = () => {
                   onChange={(e) => setCpf(e.target.value)}
                   margin="normal"
                 />
-                {listaCpf.length > 0 && (
+                {listCpf.length > 0 && (
                   <Button
                     variant="contained"
-                    onClick={(e) => buscarCpfs(e)}
+                    onClick={(e) => searchCpfs(e)}
                     sx={{
                       color: "#000000",
                       bgcolor: "transparent",
@@ -521,7 +517,7 @@ export const TableCertification = () => {
               </Box>
               <Button
                 variant="contained"
-                onClick={adicionarCpf}
+                onClick={addCpf}
                 disabled={!cpf}
                 sx={{ color: "#000000", bgcolor: "transparent" }}
               >
@@ -529,13 +525,13 @@ export const TableCertification = () => {
               </Button>
 
               <List>
-                {listaCpf.map((cpfItem, index) => (
+                {listCpf.map((cpfItem, index) => (
                   <ListItem key={index}>
                     {cpfItem}
                     <IconButton
                       edge="end"
                       aria-label="delete"
-                      onClick={() => removerCpf(cpfItem)}
+                      onClick={() => removeCpf(cpfItem)}
                     >
                       <DeleteIcon />
                     </IconButton>
