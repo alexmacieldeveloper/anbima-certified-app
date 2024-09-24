@@ -151,7 +151,6 @@ export const TableCertification = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
   const [user, setUser] = useState([]);
-  const [, setCsvFile] = useState(null);
   const [cpf, setCpf] = useState("");
   const [listCpf, setListCpf] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -163,7 +162,6 @@ export const TableCertification = () => {
 
   const fetchData = useCallback(async (event) => {
     setLoading(true);
-    setCsvFile(event.target.files[0]);
     cleanData();
 
     const formdata = new FormData();
@@ -243,7 +241,6 @@ export const TableCertification = () => {
   const searchCpfs = async (event) => {
     setLoading(true);
     cleanData()
-    setCsvFile(null)
 
     try {
       if (listCpf.length === 1) {
@@ -359,10 +356,9 @@ export const TableCertification = () => {
               startIcon={<CloudUploadIcon />}
               sx={{ color: "#000000", bgcolor: "transparent" }}
             >
-              Enviar arquivo csv
+              Enviar arquivo Excel
               <VisuallyHiddenInput
-                id="csvFileInput"
-                accept=".csv"
+                id="File-Input"
                 type="file"
                 onChange={(e) => fetchData(e)}
                 multiple
@@ -370,7 +366,7 @@ export const TableCertification = () => {
             </Button>
             {error && (
               <Typography variant="overline" color="error">
-                Ops, arquivo inválido. Insira um arquivo CSV!
+                Ops, arquivo inválido. Insira um arquivo Excel!
               </Typography>
             )}
 
@@ -471,10 +467,9 @@ export const TableCertification = () => {
                 startIcon={<CloudUploadIcon />}
                 sx={{ color: "#000000", bgcolor: "transparent" }}
               >
-                Enviar arquivo csv
+                Enviar arquivo Excel
                 <VisuallyHiddenInput
-                  id="csvFileInput"
-                  accept=".csv"
+                  id="File-Input"
                   type="file"
                   onChange={(e) => fetchData(e)}
                   multiple
