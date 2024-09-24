@@ -151,7 +151,7 @@ export const TableCertification = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [anchorEl, setAnchorEl] = useState(null);
   const [user, setUser] = useState([]);
-  const [csvFile, setCsvFile] = useState(null);
+  const [, setCsvFile] = useState(null);
   const [cpf, setCpf] = useState("");
   const [listCpf, setListCpf] = useState([]);
   const [loading, setLoading] = useState(false);
