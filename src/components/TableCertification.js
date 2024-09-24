@@ -200,49 +200,28 @@ export const TableCertification = () => {
     user
   );
 
-  function convertCSVtoExcel() {
+  function convertToExcel() {
 
-    if (csvFile && user.length) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const data = e.target.result;
-        const workbook = XLSX.read(data, { type: "string", codepage: 65001 });
+    const dataFlattened = user.flatMap((data) => {
+      return data.certifications.map((certification, index) => ({
+        cpf: data.cpf,
+        nome: data.name,
+        certificacao: certification.name,
+        primeiraCertificacao: certification.first_certification,
+        ultimaAtualizacao: certification.last_update,
+        vencimento: certification.due_date,
+        situacao: certification.status,
+      }));
+    });
+    
+    const planilha = XLSX.utils.json_to_sheet(dataFlattened);
+    const livro = XLSX.utils.book_new();
 
-        // Se o CSV tem uma única planilha
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
+    
+    XLSX.utils.book_append_sheet(livro, planilha, "Dados");
 
-        // Criar um novo arquivo Excel
-        const newWorkbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(newWorkbook, worksheet, "Sheet1");
-
-        // Exportar o arquivo Excel
-        XLSX.writeFile(newWorkbook, "output.xlsx");
-      };
-
-      reader.readAsText(csvFile);
-    } else {
-      const dataFlattened = user.flatMap((data) => {
-        return data.certifications.map((certification, index) => ({
-          cpf: data.cpf,
-          nome: data.name,
-          certificacao: certification.name,
-          primeiraCertificacao: certification.first_certification,
-          ultimaAtualizacao: certification.last_update,
-          vencimento: certification.due_date,
-          situacao: certification.status,
-        }));
-      });
-      
-      const planilha = XLSX.utils.json_to_sheet(dataFlattened);
-      const livro = XLSX.utils.book_new();
-
-      
-      XLSX.utils.book_append_sheet(livro, planilha, "Dados");
-
-      
-      XLSX.writeFile(livro, "tabela.xlsx");
-    }
+    
+    XLSX.writeFile(livro, "tabela.xlsx");
   }
   // Função para adicionar CPF à lista
   const addCpf = () => {
@@ -478,7 +457,7 @@ export const TableCertification = () => {
                   "aria-labelledby": "basic-button",
                 }}
               >
-                <MenuItem onClick={convertCSVtoExcel}>
+                <MenuItem onClick={convertToExcel}>
                   Exportar para Excel
                 </MenuItem>
               </Menu>
