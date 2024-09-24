@@ -156,12 +156,15 @@ export const TableCertification = () => {
   const [listCpf, setListCpf] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [errorCpf, setErrorCpf] = useState(false);
+
 
   const open = Boolean(anchorEl);
 
   const fetchData = useCallback(async (event) => {
     setLoading(true);
     setCsvFile(event.target.files[0]);
+    limparDados();
 
     const formdata = new FormData();
     formdata.append("file", event.target.files[0]);
@@ -198,7 +201,8 @@ export const TableCertification = () => {
   );
 
   function convertCSVtoExcel() {
-    if (user && csvFile) {
+
+    if (csvFile && user.length) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const data = e.target.result;
@@ -253,9 +257,14 @@ export const TableCertification = () => {
     setListCpf(listCpf.filter((c) => c !== cpfRemover));
   };
 
+  const cleanData = () => {
+    setUser([])
+  }
   // Função busca de CPF 
   const searchCpfs = async (event) => {
     setLoading(true);
+    cleanData()
+    setCsvFile(null)
 
     try {
       if (listCpf.length === 1) {
@@ -285,7 +294,7 @@ export const TableCertification = () => {
       }
     } catch (error) {
       setLoading(false);
-      setError(true);
+      setErrorCpf(true);
       console.error(error);
       return error;
     }
@@ -409,7 +418,7 @@ export const TableCertification = () => {
               )}
             </Box>
 
-            {error && (
+            {errorCpf && (
               <Typography variant="overline" color="error">
                 Ops, CPF inválido!
               </Typography>
