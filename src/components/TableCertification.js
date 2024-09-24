@@ -199,24 +199,50 @@ export const TableCertification = () => {
   );
 
   function convertCSVtoExcel() {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = e.target.result;
-      const workbook = XLSX.read(data, { type: "string", codepage: 65001 });
+    if (user && csvFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = e.target.result;
+        const workbook = XLSX.read(data, { type: "string", codepage: 65001 });
+  
+        // Se o CSV tem uma única planilha
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+  
+        // Criar um novo arquivo Excel
+        const newWorkbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(newWorkbook, worksheet, "Sheet1");
+  
+        // Exportar o arquivo Excel
+        XLSX.writeFile(newWorkbook, "output.xlsx");
+      };
+  
+      reader.readAsText(csvFile);
+    } else {
 
-      // Se o CSV tem uma única planilha
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
+      const dadosAchatados = user.flatMap((dado) => {
+        return dado.certifications.map((certification, index) => ({
+          cpf: dado.cpf,
+          nome: dado.name,
+          certificacao: certification.name,
+          primeiraCertificacao: certification.first_certification,
+          ultimaAtualizacao: certification.last_update,
+          vencimento: certification.due_date,
+          situacao: certification.status,
+        }));
+      });
+        // Criar nova planilha de trabalho
+        const planilha = XLSX.utils.json_to_sheet(dadosAchatados);
+        console.log("user tabble", user)
+        const livro = XLSX.utils.book_new();
 
-      // Criar um novo arquivo Excel
-      const newWorkbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(newWorkbook, worksheet, "Sheet1");
+        // Adicionar a planilha ao livro
+        XLSX.utils.book_append_sheet(livro, planilha, 'Dados');
 
-      // Exportar o arquivo Excel
-      XLSX.writeFile(newWorkbook, "output.xlsx");
-    };
+        // Gerar arquivo Excel e baixar
+        XLSX.writeFile(livro, 'tabela.xlsx');
+    }
 
-    reader.readAsText(csvFile);
   }
   // Função para adicionar CPF à lista
   const adicionarCpf = () => {
