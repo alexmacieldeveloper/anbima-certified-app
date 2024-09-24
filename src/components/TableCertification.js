@@ -164,7 +164,7 @@ export const TableCertification = () => {
   const fetchData = useCallback(async (event) => {
     setLoading(true);
     setCsvFile(event.target.files[0]);
-    limparDados();
+    cleanData();
 
     const formdata = new FormData();
     formdata.append("file", event.target.files[0]);
