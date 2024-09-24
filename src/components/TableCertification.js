@@ -206,7 +206,7 @@ export const TableCertification = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const data = e.target.result;
-        const workbook = XLSX.read(data, { type: "string", codepage: 65001 });
+        const workbook = XLSX.read(data, { type: "string", codepage: 28591 });
 
         // Se o CSV tem uma única planilha
         const sheetName = workbook.SheetNames[0];
