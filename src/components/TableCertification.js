@@ -144,7 +144,7 @@ EnhancedTableHead.propTypes = {
 };
 
 export const TableCertification = () => {
-  const [order, setOrder] = useState("");
+  const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("");
   const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
@@ -201,6 +201,14 @@ export const TableCertification = () => {
   function convertToExcel() {
 
     const dataFlattened = user.flatMap((data) => {
+      if (!data.certifications.length) {
+        return {
+          cpf: data.cpf,
+          nome: data.name,
+          certificacao: data.note,
+        }
+      }
+
       return data.certifications.map((certification, index) => ({
         cpf: data.cpf,
         nome: data.name,
@@ -605,7 +613,7 @@ export const TableCertification = () => {
                               align="right"
                             >
                               {row.name}
-                            </TableCell>
+                        </TableCell>
                             <TableCell align="right">
                               {node.name === "CPA-10" ? (
                                 <Chip
