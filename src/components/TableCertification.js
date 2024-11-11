@@ -68,6 +68,18 @@ const headCells = [
     label: "Nome",
   },
   {
+    id: "phone",
+    numeric: true,
+    disablePadding: false,
+    label: "Telefone",
+  },
+  {
+    id: "email",
+    numeric: true,
+    disablePadding: false,
+    label: "E-mail",
+  },
+  {
     id: "certification",
     numeric: true,
     disablePadding: false,
@@ -205,6 +217,8 @@ export const TableCertification = () => {
         return {
           cpf: data.cpf,
           nome: data.name,
+          telefone: data.phone,
+          email: data.email,
           certificacao: data.note,
         }
       }
@@ -212,6 +226,8 @@ export const TableCertification = () => {
       return data.certifications.map((certification, index) => ({
         cpf: data.cpf,
         nome: data.name,
+        telefone: data.phone,
+        email: data.email,
         certificacao: certification.name,
         primeiraCertificacao: certification.first_certification,
         ultimaAtualizacao: certification.last_update,
@@ -577,6 +593,24 @@ export const TableCertification = () => {
                         >
                           {row.name}
                         </TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                          align="right"
+                        >
+                          {row.phone}
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                          align="right"
+                        >
+                          {row.email}
+                        </TableCell>
 
                         <TableCell align="right">{row.note}</TableCell>
                         <TableCell align="center">-</TableCell>
@@ -613,6 +647,24 @@ export const TableCertification = () => {
                               align="right"
                             >
                               {row.name}
+                            </TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                          align="right"
+                        >
+                          {row.phone}
+                        </TableCell>
+                        <TableCell
+                          component="th"
+                          id={labelId}
+                          scope="row"
+                          padding="none"
+                          align="right"
+                        >
+                          {row.email}
                         </TableCell>
                             <TableCell align="right">
                               {node.name === "CPA-10" ? (
