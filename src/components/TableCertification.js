@@ -237,6 +237,12 @@ export const TableCertification = () => {
     });
     
     const planilha = XLSX.utils.json_to_sheet(dataFlattened);
+    
+    Object.keys(planilha).forEach((cell) => {
+      if (cell.startsWith("C")) {
+        planilha[cell].z = "0";
+      }
+    });
     const livro = XLSX.utils.book_new();
 
     
