@@ -219,7 +219,7 @@ export const TableCertification = () => {
           nome: data.name,
           telefone: data.phone,
           email: data.email,
-          certificacao: data.certificacao,
+          certificacaoPlanilha: data.certificacao,
           idProduto: data.idProduto,
           modalidade: data.modalidade,
           nomeProduto: data.nomeProduto,
