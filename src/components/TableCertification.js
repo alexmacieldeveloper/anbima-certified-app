@@ -219,6 +219,10 @@ export const TableCertification = () => {
           nome: data.name,
           telefone: data.phone,
           email: data.email,
+          certificacao: data.certificacao,
+          idProduto: data.idProduto,
+          modalidade: data.modalidade,
+          nomeProduto: data.nomeProduto,
           certificacao: data.note,
         }
       }
@@ -228,6 +232,10 @@ export const TableCertification = () => {
         nome: data.name,
         telefone: data.phone,
         email: data.email,
+        certificacaoPlanilha: data.certificacao,
+        idProduto: data.idProduto,
+        modalidade: data.modalidade,
+        nomeProduto: data.nomeProduto,
         certificacao: certification.name,
         primeiraCertificacao: certification.first_certification,
         ultimaAtualizacao: certification.last_update,
